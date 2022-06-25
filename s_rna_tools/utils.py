@@ -3,12 +3,10 @@
 Common utility function for relecov_tools package.
 """
 import os
-import glob
-import hashlib
 import logging
 from rich.console import Console
 import questionary
-import json
+
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +39,6 @@ def rich_force_colors():
 stderr = Console(
     stderr=True, style="dim", highlight=False, force_terminal=rich_force_colors()
 )
-
 
 
 def prompt_tmp_dir_path():

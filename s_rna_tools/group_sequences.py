@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import sys
-import os
 import logging
 import rich.console
 import s_rna_tools.utils
@@ -12,3 +10,8 @@ stderr = rich.console.Console(
     highlight=False,
     force_terminal=s_rna_tools.utils.rich_force_colors(),
 )
+
+
+class GroupSequences:
+    def __init__(self, file=None, out_folder=None):
+        return

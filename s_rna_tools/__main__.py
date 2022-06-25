@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import os
 import logging
 import emoji
 
@@ -128,4 +127,5 @@ s_rna_tools_cli.command(help_priority=1)
 @click.option("-o", "--out_folder", help="Path to save generated ouput files")
 def group_sequences(file, in_folder, out_folder):
     """Group small RNA sequences."""
-    new_s_group = GroupSequences(file, in_folder, out_folder)
+    new_s_group = group_sequences.GroupSequences(file, in_folder, out_folder)
+    print(new_s_group)
