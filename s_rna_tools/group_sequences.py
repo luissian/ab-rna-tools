@@ -33,15 +33,13 @@ class GroupSequences:
         self.out_folder = out_folder
         return
 
-
-
     def counter_seq(self):
         seq_counter = {}
-        for seq_record in SeqIO.parse(self.seq_file, 'fasta'):
+        for seq_record in SeqIO.parse(self.seq_file, "fasta"):
             str_seq = str(seq_record.seq)
             if str_seq not in seq_counter:
                 seq_counter[str_seq] = 0
-            seq_counter[str_seq] +=1
+            seq_counter[str_seq] += 1
             # mi_rna_list.append([str(seq_record.id), str(seq_record.seq)])
         heading = "SRNA\tSequence\tCounts"
         s_rna_tools.utils.write_seq_file(seq_counter, self.out_folder, heading, "RNA_")
