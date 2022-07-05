@@ -23,6 +23,17 @@ def file_exists(file_to_check):
     return False
 
 
+def write_seq_file(data, out_file, heading, seq_name):
+    """ write the sequence data dict to text file"""
+    counter = 1
+    with open(out_file, "w") as fh:
+        fh.write(heading + "\n")
+        for key,value in data.items():
+            fh.write(seq_name + str(counter) + "\t" + key + "\t" + str(value) + "\n")
+            counter += 1
+    return
+
+
 def rich_force_colors():
     """
     Check if any environment variables are set to force Rich to use coloured output

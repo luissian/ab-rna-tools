@@ -125,4 +125,5 @@ def s_rna_tools_cli(verbose, log_file):
 def group_sequences(file, out_folder):
     """Group small RNA sequences."""
     new_s_group = s_rna_tools.group_sequences.GroupSequences(file, out_folder, "tsv")
+    countter  = new_s_group.counter_seq()
     print(new_s_group)
