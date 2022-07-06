@@ -31,6 +31,10 @@ class GroupSequences:
                 msg="Select the folder to save results"
             )
         self.out_folder = out_folder
+
+        if out_format is None:
+            out_format = s_rna_tools.utils.prompt_selection("Define the output format", ["summary", "fasta"])
+        self.out_format = out_format
         return
 
     def counter_seq(self):
@@ -42,6 +46,13 @@ class GroupSequences:
             seq_counter[str_seq] += 1
             # mi_rna_list.append([str(seq_record.id), str(seq_record.seq)])
         heading = "SRNA\tSequence\tCounts"
-        s_rna_tools.utils.write_seq_file(seq_counter, self.out_folder, heading, "RNA_")
+        seq_id = os.path.basename(self.seq_file).split(".")[0] + "_RNA_"
+        count_f_name = os.path.join(self.out_folder, os.path.basename(self.seq_file).split(".")[0] + "_count_reads")
+        if self.out_format == "summary":
+            count_f_name += ".tsv"
+        else:
+            count_f_name += ".fa"
 
-        return seq_counter
+        s_rna_tools.utils.write_seq_file(seq_counter, count_f_name, heading, seq_id, self.out_format)
+
+        return

@@ -10,6 +10,7 @@ import rich.traceback
 
 import s_rna_tools.utils
 import s_rna_tools.group_sequences
+import s_rna_tools.create_unique
 
 log = logging.getLogger()
 
@@ -120,10 +121,21 @@ def s_rna_tools_cli(verbose, log_file):
 
 
 @s_rna_tools_cli.command(help_priority=1)
-@click.option("-f", "--file", help="fasta input file with sequences")
+@click.option("-i", "--infile", help="fasta input file with sequences")
 @click.option("-o", "--out_folder", help="Path to save generated ouput files")
-def group_sequences(file, out_folder):
+@click.option("-f", "--out_format", type=click.Choice(["summary", "fasta"]), help = "Select format for output file")
+def group_sequences(infile, out_folder, out_format):
     """Group small RNA sequences."""
-    new_s_group = s_rna_tools.group_sequences.GroupSequences(file, out_folder, "tsv")
-    countter = new_s_group.counter_seq()
-    print(new_s_group)
+    new_s_group = s_rna_tools.group_sequences.GroupSequences(infile, out_folder, out_format)
+    counter = new_s_group.counter_seq()
+    # print(counter)
+
+
+@s_rna_tools_cli.command(help_priority=2)
+@click.option("-d", "--directory", type=click.Path(), help="Folder with processed count files")
+@click.option("-o", "--out_file", help="file name to save fata file for unique sequences")
+@click.option("-f", "--out_format", type=click.Choice(["summary", "fasta"]), help = "Select format for output file")
+def create_unique(directory,out_file, out_format):
+    """Create a file which has only the unique samples"""
+    unique_seq = s_rna_tools.create_unique.CreateUnique(directory, out_file, out_format)
+    unique_seq.collect_unique()

@@ -23,16 +23,31 @@ def file_exists(file_to_check):
     return False
 
 
-def write_seq_file(data, out_file, heading, seq_name):
+def write_seq_file(data, out_file, heading, seq_name, format):
     """ write the sequence data dict to text file"""
     counter = 1
     with open(out_file, "w") as fh:
-        fh.write(heading + "\n")
-        for key,value in data.items():
-            fh.write(seq_name + str(counter) + "\t" + key + "\t" + str(value) + "\n")
-            counter += 1
+        if format == "summary":
+            fh.write(heading + "\n")
+            for key,value in data.items():
+                fh.write(seq_name + str(counter) + "\t" + key + "\t" + str(value) + "\n")
+                counter += 1
+        elif format == "fasta":
+            for key,value in data.items():
+                fh.write("> " + seq_name + str(counter) +  "_x" + str(value) + "\n")
+                fh.write(key + "\n")
+                counter += 1
+        else:
+            pass
     return
 
+def write_unique_seq(data, out_file):
+    """write the unique sequences to fasta file"""
+    with open(out_file , "w") as fh:
+        for key, value in data.items():
+            fh.write("> " + value + "\n")
+            fh.write(key + "\n")
+    return
 
 def rich_force_colors():
     """
