@@ -46,6 +46,5 @@ class FindUnknown:
     def find_blast_match(self):
         return RnaBlast(self.in_file, "blastn-short", 90, 0.05, self.out_folder)
 
-
     def get_unknow_sequences(self):
-        blast_db_obj= self.find_blast_match()
+        blast_db_obj = self.find_blast_match()

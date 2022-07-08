@@ -41,7 +41,9 @@ class CreateUnique:
         self.out_file = out_file
 
         if in_format is None:
-            in_format = s_rna_tools.utils.prompt_selection("Define the input format", ["summary", "fasta"])
+            in_format = s_rna_tools.utils.prompt_selection(
+                "Define the input format", ["summary", "fasta"]
+            )
         self.in_format = in_format
         return
 
@@ -60,7 +62,6 @@ class CreateUnique:
                     unique_seq[str(seq_record.seq)] = str(seq_record.id)
         return unique_seq
 
-
     def read_mirna_file(self):
         """Read the miRNA file, collecting the unique sequences and convert RNA to DNA sequences"""
         mirna_unique = {}
@@ -70,28 +71,28 @@ class CreateUnique:
                 mirna_unique[seq] = str(seq_record.id)
         return mirna_unique
 
-
     def remove_mirna_seq(self, sequences, mirna):
         """Remove in the unique sequences the miRNAs. miRNAs harpins are also
         discarded"""
         return
 
-
     def collect_unique(self):
         """Collect the unique sequences"""
         if self.in_format == "summary":
-            file_list = glob.glob(self.folder +  "*.tsv")
+            file_list = glob.glob(self.folder + "*.tsv")
             if len(file_list) == 0:
                 log.error("There is not valid files on folder  %s ", self.folder)
                 stderr.print(f"[red] There is not valid files on folder {self.folder}")
                 sys.exit(1)
         else:
-            file_list = glob.glob(self.folder +  "*.fa")
+            file_list = glob.glob(self.folder + "*.fa")
             if len(file_list) == 0:
-                file_list = glob(self.folder,  "/*.fasta")
+                file_list = glob(self.folder, "/*.fasta")
                 if len(file_list) == 0:
                     log.error("There is not valid files on folder  %s ", self.folder)
-                    stderr.print(f"[red] There is not valid files on folder {self.folder}")
+                    stderr.print(
+                        f"[red] There is not valid files on folder {self.folder}"
+                    )
                     sys.exit(1)
 
         unique_seq = {}
