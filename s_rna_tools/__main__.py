@@ -11,6 +11,7 @@ import rich.traceback
 import s_rna_tools.utils
 import s_rna_tools.group_sequences
 import s_rna_tools.create_unique
+import s_rna_tools.find_unknown
 
 log = logging.getLogger()
 
@@ -133,9 +134,19 @@ def group_sequences(infile, out_folder, out_format):
 
 @s_rna_tools_cli.command(help_priority=2)
 @click.option("-d", "--directory", type=click.Path(), help="Folder with processed count files")
+@click.option("-m", "--mirna", type=click.Path(), help="miRNA fasta file to exclude them in unique sequences")
 @click.option("-o", "--out_file", help="file name to save fata file for unique sequences")
 @click.option("-f", "--out_format", type=click.Choice(["summary", "fasta"]), help = "Select format for output file")
-def create_unique(directory,out_file, out_format):
+def create_unique(directory, mirna, out_file, out_format):
     """Create a file which has only the unique samples"""
-    unique_seq = s_rna_tools.create_unique.CreateUnique(directory, out_file, out_format)
+    unique_seq = s_rna_tools.create_unique.CreateUnique(directory, mirna, out_file, out_format)
     unique_seq.collect_unique()
+
+
+@s_rna_tools_cli.command(help_priority=3)
+@click.option("-i", "--in_seq", type=click.Path(), help="file having the unique reads")
+@click.option("-m", "--match_to_file", type=click.Path(), help="file with the sequences to discard")
+@click.option("-o", "--outdir", type=click.Path(), help="output directory to save result")
+def find_unknown(in_seq, match_to_file, outdir):
+    new_findings = s_rna_tools.find_unknown.FindUnknown(in_seq, match_to_file, outdir)
+    new_findings.get_unknow_sequences()

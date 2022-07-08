@@ -17,7 +17,7 @@ stderr = rich.console.Console(
 
 
 class CreateUnique:
-    def __init__(self, folder=None, out_file=None, in_format=None):
+    def __init__(self, folder=None, mirna=None, out_file=None, in_format=None):
         if folder is None:
             folder = s_rna_tools.utils.prompt_path(
                 msg="Select the fasta file to group sequences"
@@ -27,6 +27,13 @@ class CreateUnique:
             log.error("folder  %s does not exist ", self.folder)
             stderr.print(f"[red] Folder for input files {self.folder} does not exist")
             sys.exit(1)
+        if mirna:
+            if not s_rna_tools.utils.file_exists(mirna):
+                log.error("miRNA file  %s does not exist ", mirna)
+                stderr.print(f"[red] miRNA file  {mirna} does not exist")
+                sys.exit(1)
+        self.mirna = mirna
+
         if out_file is None:
             out_file = s_rna_tools.utils.prompt_path(
                 msg="Select the file to save results"
@@ -54,6 +61,22 @@ class CreateUnique:
         return unique_seq
 
 
+    def read_mirna_file(self):
+        """Read the miRNA file, collecting the unique sequences and convert RNA to DNA sequences"""
+        mirna_unique = {}
+        for seq_record in SeqIO.parse(self.mirna, "fasta"):
+            seq = str(seq_record.seq.back_transcribe())
+            if seq not in mirna_unique:
+                mirna_unique[seq] = str(seq_record.id)
+        return mirna_unique
+
+
+    def remove_mirna_seq(self, sequences, mirna):
+        """Remove in the unique sequences the miRNAs. miRNAs harpins are also
+        discarded"""
+        return
+
+
     def collect_unique(self):
         """Collect the unique sequences"""
         if self.in_format == "summary":
@@ -74,4 +97,6 @@ class CreateUnique:
         unique_seq = {}
         for f_name in file_list:
             unique_seq = self.find_unique_in_file(f_name, unique_seq)
+        if self.mirna:
+            pass
         s_rna_tools.utils.write_unique_seq(unique_seq, self.out_file)
