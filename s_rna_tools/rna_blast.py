@@ -3,7 +3,18 @@ from Bio.Blast.Applications import NcbiblastnCommandline
 import os
 import sys
 import subprocess
+import logging
+import rich.console
+import s_rna_tools.utils
 
+
+log = logging.getLogger(__name__)
+stderr = rich.console.Console(
+    stderr=True,
+    style="dim",
+    highlight=False,
+    force_terminal=s_rna_tools.utils.rich_force_colors(),
+)
 
 class RnaBlast:
     def __init__(self, blast_fasta, task, perc_identity, evalue, out_dir):
@@ -19,19 +30,26 @@ class RnaBlast:
             + " -dbtype nucl -input_type fasta -out "
             + self.db_folder
         )
-        try:
-            with subprocess.Popen(
-                blastn_db,
-                shell=True,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            ) as proc:
-                stderr.print("Successful creation of blast database")
-        except subprocess.CalledProcessError:
+        # stderr.print("Starting blast index generation. Please wait")
+
+        proc = subprocess.Popen(
+            blastn_db,
+            shell=True,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+
+        proc.wait()
+        if proc.returncode == 0 :
+            stderr.print("Successful creation of blast database")
+        else:
             log.error("Unable to create blast database. Error %s ", proc.returncode)
-            stderr.print(f"[red] Unable to create blast database {proc.stderr}")
+            log.error("running the following parameters %s", proc.args)
+            stderr.print(f"[red] Unable to create blast database {proc.returncode}")
+            stderr.print(f"[red] running the following parameters {proc.args}")
             sys.exit(1)
+
 
     def collect_data(self, out_lines):
         matches_found = []
@@ -39,7 +57,7 @@ class RnaBlast:
             matches_found.append(out_line.split("\t"))
         return matches_found
 
-    def run_blast(query_file, match):
+    def run_blast(self, query_file):
         blast_parameters = '"6 , qseqid , sseqid , pident ,  qlen , length , mismatch , gapopen , evalue , bitscore , sstart , send , qstart , qend , sseq , qseq"'
         result = {}
         cline = NcbiblastnCommandline(
@@ -50,19 +68,23 @@ class RnaBlast:
             outfmt=blast_parameters,
             max_target_seqs=50,
             max_hsps=20,
-            num_threads=4,
+            num_threads=8,
             query=query_file,
         )
         out, err = cline()
         out_lines = out.splitlines()
-
-        if match:
-            if len(out_lines) > 0:
-                result["match"] = self.collect_data(out_lines)
+        if len(out_lines) > 0:
+            result["match"] = self.collect_data(out_lines)
         else:
-            if len(out_lines) == 0:
-                result["not_match"] = query_file
-        import pdb
+            result["not_match"] = query_file
 
-        pdb.set_trace()
         return result
+
+    def write_to_file(self, data, file_name):
+        match_heading = 'Sample\tmiRNA Name\tcontig\tpident\tmiRNA\tlength\tmismatch\tgapopen\tevalue\tbitscore\tSample start\tSample end\tmiRNA start\tmiRNA end\tSample Sequence\tmiRNA Sequence'
+        with open(file_name, "w") as fh:
+            fh.write(match_heading + "\n")
+            for key, values in data.items():
+                for value in values:
+                    fh.write(key + "\t" + "\t".join(value) + "\n")
+        return

@@ -11,7 +11,7 @@ import rich.traceback
 import s_rna_tools.utils
 import s_rna_tools.group_sequences
 import s_rna_tools.create_unique
-import s_rna_tools.find_unknown
+import s_rna_tools.find_match
 
 log = logging.getLogger()
 
@@ -130,10 +130,15 @@ def s_rna_tools_cli(verbose, log_file):
     type=click.Choice(["summary", "fasta"]),
     help="Select format for output file",
 )
-def group_sequences(infile, out_folder, out_format):
+@click.option(
+    "-t",
+    "--threshold",
+    help="Ignore the sequences founded below the threshold"
+)
+def group_sequences(infile, out_folder, out_format, threshold):
     """Group small RNA sequences."""
     new_s_group = s_rna_tools.group_sequences.GroupSequences(
-        infile, out_folder, out_format
+        infile, out_folder, out_format, threshold
     )
     counter = new_s_group.counter_seq()
     # print(counter)
@@ -177,6 +182,12 @@ def create_unique(directory, mirna, out_file, out_format):
 @click.option(
     "-o", "--outdir", type=click.Path(), help="output directory to save result"
 )
-def find_unknown(in_seq, match_to_file, outdir):
-    new_findings = s_rna_tools.find_unknown.FindUnknown(in_seq, match_to_file, outdir)
-    new_findings.get_unknow_sequences()
+@click.option(
+    "-k",
+    "--known_match",
+    type=click.Choice(["known", "unknown"]),
+    help="Select format for output file",
+)
+def find_match(in_seq, match_to_file, outdir, known_match):
+    new_findings = s_rna_tools.find_match.FindMatch(in_seq, match_to_file, outdir, known_match)
+    new_findings.get_match_sequences()

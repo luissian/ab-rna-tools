@@ -16,7 +16,7 @@ stderr = rich.console.Console(
 
 
 class GroupSequences:
-    def __init__(self, seq_file=None, out_folder=None, out_format=None):
+    def __init__(self, seq_file=None, out_folder=None, out_format=None, threshold=1):
         if seq_file is None:
             seq_file = s_rna_tools.utils.prompt_path(
                 msg="Select the fasta file to group sequences"
@@ -35,6 +35,13 @@ class GroupSequences:
         if out_format is None:
             out_format = s_rna_tools.utils.prompt_selection("Define the output format", ["summary", "fasta"])
         self.out_format = out_format
+        try:
+            self.threshold = int(threshold)
+        except ValueError:
+            log.error("%s is not a valid value for threshold. Integer value must be set", threshold)
+            stderr.print(f"[red] {threshold} is not a valid value for threshold. Integer value must be set")
+            sys.exit(1)
+
         return
 
     def counter_seq(self):
