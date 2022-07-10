@@ -70,7 +70,7 @@ class GroupSequences:
             if str_seq not in seq_counter:
                 seq_counter[str_seq] = 0
             seq_counter[str_seq] += 1
-        spinner.succeed('Created index')
+        spinner.succeed('Processed sequence file')
 
         if self.threshold != 0:
             spinner.start("filtering sequences for removing low values")
@@ -86,9 +86,14 @@ class GroupSequences:
             count_f_name += ".tsv"
         else:
             count_f_name += ".fa"
-
+        stderr.print(
+            f"[green] Saving data to file"
+        )
         s_rna_tools.utils.write_seq_file(
             seq_counter, count_f_name, heading, seq_id, self.out_format
         )
-        spinner.stop('Sequence completed')
+        spinner.stop()
+        stderr.print(
+            f"[green] Processing file {os.path.basename(self.seq_file)} completed"
+        )
         return

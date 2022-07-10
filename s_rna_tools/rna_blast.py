@@ -42,11 +42,11 @@ class RnaBlast:
 
         proc.wait()
         if proc.returncode == 0 :
-            stderr.print("Successful creation of blast database")
+            stderr.print("\nSuccessful creation of blast database")
         else:
             log.error("Unable to create blast database. Error %s ", proc.returncode)
             log.error("running the following parameters %s", proc.args)
-            stderr.print(f"[red] Unable to create blast database {proc.returncode}")
+            stderr.print(f"\n[red] Unable to create blast database {proc.returncode}")
             stderr.print(f"[red] running the following parameters {proc.args}")
             sys.exit(1)
 
@@ -66,7 +66,7 @@ class RnaBlast:
             evalue=self.evalue,
             perc_identity=self.perc_identity,
             outfmt=blast_parameters,
-            max_target_seqs=50,
+            max_target_seqs=200,
             max_hsps=20,
             num_threads=8,
             query=query_file,

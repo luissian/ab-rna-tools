@@ -50,9 +50,29 @@ class FindMatch:
 
     def extract_sequences(self):
         sequences = {}
-        for seq_record in SeqIO.parse(self.m_file, "fasta"):
+        for seq_record in SeqIO.parse(self.in_file, "fasta"):
             sequences[str(seq_record.seq)] = str(seq_record.id)
         return sequences
+
+    def get_not_matched(self, sequences, f_name):
+        """Read the file which contains the found matches and discard them from
+        the unique m_sequences
+        """
+        with open(f_name, "r") as fh:
+            lines = fh.readlines()
+        seq_in_file = []
+        for line in lines[1:]:
+            seq_in_file.append(line.split("\t")[2])
+        not_match_id = list(set(sequences.values()).symmetric_difference(set(seq_in_file)))
+        return dict.fromkeys(not_match_id)
+
+    def write_unknown_to_file(self, data, f_name):
+        """Write the unknown sequences in fasta format"""
+        with open(f_name, "w") as fh:
+            for id, seq in data.items():
+                fh.write("> " + id + "\n")
+                fh.write(seq + "\n")
+        return
 
     def get_match_sequences(self):
         spinner = Halo(text='Creating Blast index', spinner='dots')
@@ -60,6 +80,8 @@ class FindMatch:
         blast_obj = self.create_blast_instance()
         spinner.succeed('Created index')
         spinner.start("Executing blast")
+        in_sequences = self.extract_sequences()
+        """
         if self.known_match == "unknown":
             unknow_seq = {}
             m_sequences = self.extract_sequences()
@@ -79,12 +101,21 @@ class FindMatch:
             import pdb; pdb.set_trace()
 
         else:
-            blast_res = blast_obj.run_blast(self.m_file)
-            if "match" in blast_res:
-                out_file = os.path.join(self.out_folder, "blast_results.tsv")
-                blast_obj.write_to_file(blast_res, out_file)
-            else:
-                stderr.print("Not found any match with the query file")
-        spinner.succeed()
+        """
+        blast_res = blast_obj.run_blast(self.m_file)
+        if "match" in blast_res:
+            out_file = os.path.join(self.out_folder, "blast_results.tsv")
+            blast_obj.write_to_file(blast_res, out_file)
+        else:
+            stderr.print("[red] Not found any match with the query file")
+        spinner.succeed("Blast completed")
         spinner.stop()
+        if self.known_match == "unknown":
+            not_matched = self.get_not_matched(in_sequences, out_file)
+            u_sequences_dict = {}
+            for seq, id in in_sequences.items():
+                if id in not_matched:
+                    u_sequences_dict[id] = seq
+            f_name = os.path.join(self.out_folder, "unknown_sequences.fa")
+            self.write_unknown_to_file(u_sequences_dict, f_name)
         import pdb; pdb.set_trace()
