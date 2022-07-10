@@ -3,6 +3,7 @@ import os
 import sys
 import logging
 import rich.console
+from halo import Halo
 from Bio import SeqIO
 import glob
 import s_rna_tools.utils
@@ -96,8 +97,13 @@ class CreateUnique:
                     sys.exit(1)
 
         unique_seq = {}
+        stderr.print("Starting collecting unique sequences")
+        spinner = Halo(spinner='dots')
+        spinner.start()
         for f_name in file_list:
             unique_seq = self.find_unique_in_file(f_name, unique_seq)
+        spinner.stop()
         if self.mirna:
             pass
         s_rna_tools.utils.write_unique_seq(unique_seq, self.out_file)
+        stderr.print("Completed")
