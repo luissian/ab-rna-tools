@@ -138,8 +138,7 @@ def group_sequences(infile, out_folder, out_format, threshold):
     new_s_group = s_rna_tools.group_sequences.GroupSequences(
         infile, out_folder, out_format, threshold
     )
-    counter = new_s_group.counter_seq()
-    # print(counter)
+    new_s_group.counter_seq()
 
 
 @s_rna_tools_cli.command(help_priority=2)

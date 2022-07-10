@@ -86,7 +86,7 @@ class GroupSequences:
             count_f_name += ".tsv"
         else:
             count_f_name += ".fa"
-        stderr.print(f"[green] Saving data to file")
+        stderr.print("[green] Saving data to file")
         s_rna_tools.utils.write_seq_file(
             seq_counter, count_f_name, heading, seq_id, self.out_format
         )
