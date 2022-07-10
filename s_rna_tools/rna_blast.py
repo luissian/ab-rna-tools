@@ -16,6 +16,7 @@ stderr = rich.console.Console(
     force_terminal=s_rna_tools.utils.rich_force_colors(),
 )
 
+
 class RnaBlast:
     def __init__(self, blast_fasta, task, perc_identity, evalue, out_dir):
         self.blast_db = blast_fasta
@@ -41,7 +42,7 @@ class RnaBlast:
         )
 
         proc.wait()
-        if proc.returncode == 0 :
+        if proc.returncode == 0:
             stderr.print("\nSuccessful creation of blast database")
         else:
             log.error("Unable to create blast database. Error %s ", proc.returncode)
@@ -49,7 +50,6 @@ class RnaBlast:
             stderr.print(f"\n[red] Unable to create blast database {proc.returncode}")
             stderr.print(f"[red] running the following parameters {proc.args}")
             sys.exit(1)
-
 
     def collect_data(self, out_lines):
         matches_found = []
@@ -81,7 +81,7 @@ class RnaBlast:
         return result
 
     def write_to_file(self, data, file_name):
-        match_heading = 'Sample\tmiRNA Name\tcontig\tpident\tmiRNA\tlength\tmismatch\tgapopen\tevalue\tbitscore\tSample start\tSample end\tmiRNA start\tmiRNA end\tSample Sequence\tmiRNA Sequence'
+        match_heading = "Sample\tmiRNA Name\tcontig\tpident\tmiRNA\tlength\tmismatch\tgapopen\tevalue\tbitscore\tSample start\tSample end\tmiRNA start\tmiRNA end\tSample Sequence\tmiRNA Sequence"
         with open(file_name, "w") as fh:
             fh.write(match_heading + "\n")
             for key, values in data.items():

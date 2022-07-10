@@ -131,9 +131,7 @@ def s_rna_tools_cli(verbose, log_file):
     help="Select format for output file",
 )
 @click.option(
-    "-t",
-    "--threshold",
-    help="Ignore the sequences founded below the threshold"
+    "-t", "--threshold", help="Ignore the sequences founded below the threshold"
 )
 def group_sequences(infile, out_folder, out_format, threshold):
     """Group small RNA sequences."""
@@ -189,5 +187,7 @@ def create_unique(directory, mirna, out_file, out_format):
     help="Select format for output file",
 )
 def find_match(in_seq, match_to_file, outdir, known_match):
-    new_findings = s_rna_tools.find_match.FindMatch(in_seq, match_to_file, outdir, known_match)
+    new_findings = s_rna_tools.find_match.FindMatch(
+        in_seq, match_to_file, outdir, known_match
+    )
     new_findings.get_match_sequences()

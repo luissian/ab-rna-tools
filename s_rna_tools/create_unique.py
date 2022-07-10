@@ -98,7 +98,7 @@ class CreateUnique:
 
         unique_seq = {}
         stderr.print("Starting collecting unique sequences")
-        spinner = Halo(spinner='dots')
+        spinner = Halo(spinner="dots")
         spinner.start()
         for f_name in file_list:
             unique_seq = self.find_unique_in_file(f_name, unique_seq)

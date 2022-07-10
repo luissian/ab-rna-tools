@@ -63,19 +63,19 @@ class GroupSequences:
 
     def counter_seq(self):
         seq_counter = {}
-        spinner = Halo(text='Searching for repeated contings', spinner='dots')
+        spinner = Halo(text="Searching for repeated contings", spinner="dots")
         spinner.start()
         for seq_record in SeqIO.parse(self.seq_file, "fasta"):
             str_seq = str(seq_record.seq)
             if str_seq not in seq_counter:
                 seq_counter[str_seq] = 0
             seq_counter[str_seq] += 1
-        spinner.succeed('Processed sequence file')
+        spinner.succeed("Processed sequence file")
 
         if self.threshold != 0:
             spinner.start("filtering sequences for removing low values")
             seq_counter = self.filter_seq(seq_counter)
-            spinner.succeed('Filter done')
+            spinner.succeed("Filter done")
         heading = "SRNA\tSequence\tCounts"
         seq_id = os.path.basename(self.seq_file).split(".")[0] + "_RNA_"
         count_f_name = os.path.join(
@@ -86,9 +86,7 @@ class GroupSequences:
             count_f_name += ".tsv"
         else:
             count_f_name += ".fa"
-        stderr.print(
-            f"[green] Saving data to file"
-        )
+        stderr.print(f"[green] Saving data to file")
         s_rna_tools.utils.write_seq_file(
             seq_counter, count_f_name, heading, seq_id, self.out_format
         )

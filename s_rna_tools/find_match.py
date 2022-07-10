@@ -4,7 +4,6 @@ import sys
 import logging
 import rich.console
 from Bio import SeqIO
-import glob
 import s_rna_tools.utils
 from s_rna_tools.rna_blast import RnaBlast
 from halo import Halo
@@ -63,7 +62,9 @@ class FindMatch:
         seq_in_file = []
         for line in lines[1:]:
             seq_in_file.append(line.split("\t")[2])
-        not_match_id = list(set(sequences.values()).symmetric_difference(set(seq_in_file)))
+        not_match_id = list(
+            set(sequences.values()).symmetric_difference(set(seq_in_file))
+        )
         return dict.fromkeys(not_match_id)
 
     def write_unknown_to_file(self, data, f_name):
@@ -75,10 +76,10 @@ class FindMatch:
         return
 
     def get_match_sequences(self):
-        spinner = Halo(text='Creating Blast index', spinner='dots')
+        spinner = Halo(text="Creating Blast index", spinner="dots")
         spinner.start()
         blast_obj = self.create_blast_instance()
-        spinner.succeed('Created index')
+        spinner.succeed("Created index")
         spinner.start("Executing blast")
         in_sequences = self.extract_sequences()
         """
@@ -118,4 +119,3 @@ class FindMatch:
                     u_sequences_dict[id] = seq
             f_name = os.path.join(self.out_folder, "unknown_sequences.fa")
             self.write_unknown_to_file(u_sequences_dict, f_name)
-        import pdb; pdb.set_trace()
