@@ -18,7 +18,14 @@ stderr = rich.console.Console(
 
 
 class FindMatch:
-    def __init__(self, in_file=None, m_file=None, out_folder=None, known_list=None, known_match="known"):
+    def __init__(
+        self,
+        in_file=None,
+        m_file=None,
+        out_folder=None,
+        known_list=None,
+        known_match="known",
+    ):
         if in_file is None:
             in_file = s_rna_tools.utils.prompt_path(
                 msg="Select the fasta file with the sequences"

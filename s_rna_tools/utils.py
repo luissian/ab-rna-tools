@@ -85,3 +85,8 @@ def prompt_selection(msg, choices):
 def prompt_path(msg):
     source = questionary.path(msg).unsafe_ask()
     return source
+
+
+def prompt_message(msg):
+    value = questionary.text(msg).unsafe_ask()
+    return value

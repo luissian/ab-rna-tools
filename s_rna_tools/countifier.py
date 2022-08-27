@@ -5,7 +5,6 @@ import re
 import logging
 import rich.console
 from glob import glob
-from halo import Halo
 from Bio import SeqIO
 import s_rna_tools.utils
 
@@ -21,7 +20,7 @@ stderr = rich.console.Console(
 class Countifier:
     def __init__(self, sample_files=None, unique_seq=None, out_folder=None):
         if sample_files is None:
-            sample_files =  s_rna_tools.utils.prompt_path(
+            sample_files = s_rna_tools.utils.prompt_path(
                 msg="Select the sample file or directory with the count reads"
             )
         if os.path.isdir(sample_files):
@@ -29,8 +28,12 @@ class Countifier:
             if len(file_list) == 0:
                 file_list = glob(sample_files + "/*.fasta")
                 if len(file_list) == 0:
-                    log.error("folder  %s does not contain any fasta file", self.sample_files)
-                    stderr.print(f"[red] Folder  {self.sample_files} does not contain any fasta file")
+                    log.error(
+                        "folder  %s does not contain any fasta file", self.sample_files
+                    )
+                    stderr.print(
+                        f"[red] Folder  {self.sample_files} does not contain any fasta file"
+                    )
                     sys.exit(1)
             self.file_list = file_list
         elif os.path.isfile(sample_files):
@@ -40,7 +43,7 @@ class Countifier:
             stderr.print(f"[red] {self.sample_files} does not exist")
             sys.exit(1)
         if unique_seq is None:
-            unique_seq =  s_rna_tools.utils.prompt_path(
+            unique_seq = s_rna_tools.utils.prompt_path(
                 msg="Select the file which contains the unique sequences"
             )
         if not os.path.isfile(unique_seq):
@@ -58,11 +61,11 @@ class Countifier:
         """Read the unique sequence file and return a dictonary with the sequences"""
         seq_dict = {}
         for seq_record in SeqIO.parse(fasta_file, "fasta"):
-            id_match = re.search(r'.*_x(\d+)$', str(seq_record.id))
+            id_match = re.search(r".*_x(\d+)$", str(seq_record.id))
             if id_match:
                 seq_dict[str(seq_record.seq)] = id_match.group(1)
             else:
-                seq_dict[str(seq_record.seq)]  = 0
+                seq_dict[str(seq_record.seq)] = 0
         return seq_dict
 
     def fetch_sample_counts(self, s_file, seq_master):
@@ -95,7 +98,6 @@ class Countifier:
                 fh.write(seq + "\t" + str(count) + "\t" + "\t".join(value_list) + "\n")
         return
 
-
     def split_files(self):
         """Read the unique sequence file, find the sequence in the sample count
         reads and create a file having the number that the sequence was found
@@ -104,7 +106,7 @@ class Countifier:
         samples_dict = {}
         for s_file in self.file_list:
             f_name = os.path.basename(s_file).split(".")[0]
-            f_match = re.search(r'(.*)_count_reads.*', f_name)
+            f_match = re.search(r"(.*)_count_reads.*", f_name)
             if f_match:
                 s_name = f_match.group(1)
             else:

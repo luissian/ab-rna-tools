@@ -13,6 +13,7 @@ import s_rna_tools.group_sequences
 import s_rna_tools.create_unique
 import s_rna_tools.find_match
 import s_rna_tools.countifier
+import s_rna_tools.join_duplicates
 
 log = logging.getLogger()
 
@@ -202,7 +203,9 @@ def find_match(in_seq, match_to_file, outdir, known_list, known_match):
 
 
 @s_rna_tools_cli.command(help_priority=4)
-@click.option("-u", "--unique_seq", type=click.Path(), help="file having the unique reads")
+@click.option(
+    "-u", "--unique_seq", type=click.Path(), help="file having the unique reads"
+)
 @click.option(
     "-s",
     "--sample_file",
@@ -212,6 +215,22 @@ def find_match(in_seq, match_to_file, outdir, known_list, known_match):
 @click.option(
     "-o", "--outdir", type=click.Path(), help="output directory to save result"
 )
-def countifier(sample_file, unique_seq, outdir ):
+def countifier(sample_file, unique_seq, outdir):
     new_cuantifier = s_rna_tools.countifier.Countifier(sample_file, unique_seq, outdir)
     new_cuantifier.split_files()
+
+
+@s_rna_tools_cli.command(help_priority=5)
+@click.option(
+    "-i",
+    "--input",
+    type=click.Path(),
+    help="file having the output counts from mirdeep",
+)
+@click.option(
+    "-p", "position", type=click.INT, help="position where checking if duplicated"
+)
+def join_duplicates(input, position):
+    unique_count = s_rna_tools.join_duplicates.JoinDuplicates(input, position)
+    result = unique_count.make_unique()
+    unique_count.write_join(result)
