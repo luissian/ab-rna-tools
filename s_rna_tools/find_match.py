@@ -18,7 +18,7 @@ stderr = rich.console.Console(
 
 
 class FindMatch:
-    def __init__(self, in_file=None, m_file=None, out_folder=None, known_match="known"):
+    def __init__(self, in_file=None, m_file=None, out_folder=None, known_list=None, known_match="known"):
         if in_file is None:
             in_file = s_rna_tools.utils.prompt_path(
                 msg="Select the fasta file with the sequences"
@@ -43,9 +43,10 @@ class FindMatch:
             )
         self.out_folder = out_folder
         self.known_match = known_match
+        self.create_known_list = known_list
 
     def create_blast_instance(self):
-        return RnaBlast(self.in_file, "blastn-short", 90, 0.05, self.out_folder)
+        return RnaBlast(self.in_file, "blastn-short", 100, 0.05, self.out_folder)
 
     def extract_sequences(self):
         sequences = {}
@@ -67,6 +68,20 @@ class FindMatch:
         )
         return dict.fromkeys(not_match_id)
 
+    def get_known_items(self, data):
+        """From blast ouput get the known id and create a list without duplication"""
+        k_found = []
+        for row in data:
+            k_found.append(row[0])
+        return list(set(k_found))
+
+    def write_know_items_to_file(self, data, f_name):
+        """Write the known items to file"""
+        with open(f_name, "w") as fh:
+            for item in data:
+                fh.write(item + "\n")
+        return
+
     def write_unknown_to_file(self, data, f_name):
         """Write the unknown sequences in fasta format"""
         with open(f_name, "w") as fh:
@@ -82,35 +97,23 @@ class FindMatch:
         spinner.succeed("Created index")
         spinner.start("Executing blast")
         in_sequences = self.extract_sequences()
-        """
-        if self.known_match == "unknown":
-            unknow_seq = {}
-            m_sequences = self.extract_sequences()
-            tmp_folder = os.path.join(self.out_folder,"tmp_seq")
-            os.makedirs(tmp_folder, exist_ok=True)
-            # Create new temporary file for each of sequences
-            for m_sequence, seq_id in m_sequences.items():
-                q_file = os.path.join(tmp_folder,seq_id + ".fa")
-                with open (q_file, "w") as fh:
-                    fh.write("> " + seq_id + "\n")
-                    fh.write(m_sequence)
-                blast_res = blast_obj.run_blast(q_file)
-                # delete temp file
-                os.remove(q_file)
-                if "not_match" in blast_res:
-                    unknow_seq[seq_id] = m_sequence
-            import pdb; pdb.set_trace()
-
-        else:
-        """
         blast_res = blast_obj.run_blast(self.m_file)
-        if "match" in blast_res:
-            out_file = os.path.join(self.out_folder, "blast_results.tsv")
-            blast_obj.write_to_file(blast_res, out_file)
-        else:
-            stderr.print("[red] Not found any match with the query file")
         spinner.succeed("Blast completed")
         spinner.stop()
+        if "match" in blast_res:
+            sample = os.path.basename(self.in_file).split(".")[0]
+            # Rename the dictonary key value
+            blast_res[sample] = blast_res.pop("match")
+            out_file = os.path.join(self.out_folder, sample + "blast_results.tsv")
+            blast_obj.write_to_file(blast_res, out_file)
+            if self.create_known_list:
+                k_list = self.get_known_items(blast_res[sample])
+                k_file = os.path.join(self.out_folder, sample + "know_items.txt")
+                stderr.print("[green] Writting know items to file")
+                self.write_know_items_to_file(k_list, k_file)
+        else:
+            stderr.print("[red] Not found any match with the query file")
+
         if self.known_match == "unknown":
             not_matched = self.get_not_matched(in_sequences, out_file)
             u_sequences_dict = {}
@@ -119,3 +122,5 @@ class FindMatch:
                     u_sequences_dict[id] = seq
             f_name = os.path.join(self.out_folder, "unknown_sequences.fa")
             self.write_unknown_to_file(u_sequences_dict, f_name)
+        stderr.print("[green] Completed")
+        return

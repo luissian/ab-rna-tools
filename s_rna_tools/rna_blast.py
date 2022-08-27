@@ -64,6 +64,7 @@ class RnaBlast:
             db=self.db_folder,
             task=self.task,
             evalue=self.evalue,
+            penalty=-2,
             perc_identity=self.perc_identity,
             outfmt=blast_parameters,
             max_target_seqs=200,

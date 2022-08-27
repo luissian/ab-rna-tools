@@ -12,6 +12,7 @@ import s_rna_tools.utils
 import s_rna_tools.group_sequences
 import s_rna_tools.create_unique
 import s_rna_tools.find_match
+import s_rna_tools.countifier
 
 log = logging.getLogger()
 
@@ -180,13 +181,37 @@ def create_unique(directory, mirna, out_file, out_format):
     "-o", "--outdir", type=click.Path(), help="output directory to save result"
 )
 @click.option(
+    "-l",
+    "--known_list",
+    is_flag=True,
+    default=None,
+    help="Create file with the found matched sequence ids",
+)
+@click.option(
     "-k",
     "--known_match",
     type=click.Choice(["known", "unknown"]),
     help="Select format for output file",
 )
-def find_match(in_seq, match_to_file, outdir, known_match):
+def find_match(in_seq, match_to_file, outdir, known_list, known_match):
+    """Find sequences that match with the selected files"""
     new_findings = s_rna_tools.find_match.FindMatch(
-        in_seq, match_to_file, outdir, known_match
+        in_seq, match_to_file, outdir, known_list, known_match
     )
     new_findings.get_match_sequences()
+
+
+@s_rna_tools_cli.command(help_priority=4)
+@click.option("-u", "--unique_seq", type=click.Path(), help="file having the unique reads")
+@click.option(
+    "-s",
+    "--sample_file",
+    type=click.Path(),
+    help="file with the count reads sequences",
+)
+@click.option(
+    "-o", "--outdir", type=click.Path(), help="output directory to save result"
+)
+def countifier(sample_file, unique_seq, outdir ):
+    new_cuantifier = s_rna_tools.countifier.Countifier(sample_file, unique_seq, outdir)
+    new_cuantifier.split_files()
