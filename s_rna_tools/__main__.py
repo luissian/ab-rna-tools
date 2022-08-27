@@ -225,7 +225,7 @@ def countifier(sample_file, unique_seq, outdir):
     "-i",
     "--input",
     type=click.Path(),
-    help="file having the output counts from mirdeep",
+    help="file having duplicated value in a key value",
 )
 @click.option(
     "-p", "position", type=click.INT, help="position where checking if duplicated"
