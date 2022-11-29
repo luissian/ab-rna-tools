@@ -14,6 +14,7 @@ import s_rna_tools.create_unique
 import s_rna_tools.find_match
 import s_rna_tools.countifier
 import s_rna_tools.join_duplicates
+import s_rna_tools.match_all_smrna
 
 log = logging.getLogger()
 
@@ -234,3 +235,18 @@ def join_duplicates(input, position):
     unique_count = s_rna_tools.join_duplicates.JoinDuplicates(input, position)
     result = unique_count.make_unique()
     unique_count.write_join(result)
+
+
+@s_rna_tools_cli.command(help_priority=6)
+@click.option(
+    "-r", "--grep_result", type=click.Path(), help="file having the grep result"
+)
+@click.option(
+    "-s", "--sample_file", type=click.Path(), help="file having the sequences counts per sample"
+)
+@click.option(
+    "-o", "--outdir", type=click.Path(), help="output directory to save result"
+)
+def match_all_smrna(grep_result, sample_file, outdir):
+    match_smrna = s_rna_tools.match_all_smrna.MatchAllSmrna(grep_result, sample_file, outdir)
+    match_smrna.get_match_sequences()
